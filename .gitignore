@@ -1,0 +1,11 @@
+# CombatPrep
+*.pyc
+__pycache__/
+db.sqlite3
+staticfiles/
+*.sqlite3
+.env
+*.egg-info/
+dist/
+build/
+.DS_Store

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Score — CombatPrep{% endblock %}
+{% block page_title %}Record Readiness Score{% endblock %}
+
+{% block content %}
+<div class="card card--form">
+    <div class="card-header">
+        <h2 class="card-title">🎯 Record Score</h2>
+    </div>
+    <div class="card-body">
+        <form method="post" class="app-form" id="score-form">
+            {% csrf_token %}
+            {% if form.errors %}
+            <div class="form-errors">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>{{ field.label }}: {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<small class="form-help">{{ field.help_text }}</small>{% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Live Overall Preview -->
+            <div class="score-preview" id="score-preview">
+                <div class="score-preview-label">Estimated Overall Score</div>
+                <div class="score-preview-value" id="preview-overall">—</div>
+                <div class="score-preview-level" id="preview-level"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="submit-score">Save Score</button>
+                <a href="{% url 'officer_dashboard' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

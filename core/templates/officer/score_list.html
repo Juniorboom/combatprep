@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Scores — CombatPrep{% endblock %}
+{% block page_title %}All Recorded Scores{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Recorded Readiness Scores</h2>
+        <a href="{% url 'record_score' %}" class="btn btn-sm btn-primary">+ Record Score</a>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="all-scores-table">
+            <thead>
+                <tr>
+                    <th>Soldier</th>
+                    <th>Physical</th>
+                    <th>Mental</th>
+                    <th>Equipment</th>
+                    <th>Overall</th>
+                    <th>Level</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in scores %}
+                <tr>
+                    <td>{{ s.soldier.get_full_name|default:s.soldier.username }}</td>
+                    <td>{{ s.physical_score }}</td>
+                    <td>{{ s.mental_score }}</td>
+                    <td>{{ s.equipment_score }}</td>
+                    <td><strong>{{ s.overall_score }}</strong></td>
+                    <td><span class="badge badge--readiness-{{ s.readiness_level|slugify }}">{{ s.readiness_level }}</span></td>
+                    <td>{{ s.date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="table-empty">No scores recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

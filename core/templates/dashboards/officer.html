@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Officer Dashboard — CombatPrep{% endblock %}
+{% block page_title %}Officer Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card stat-card--primary">
+        <div class="stat-icon">🎖</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ total_soldiers }}</span>
+            <span class="stat-label">Active Soldiers</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--success">
+        <div class="stat-icon">📝</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ assessments_count }}</span>
+            <span class="stat-label">Assessments Given</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--warning">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ scores_count }}</span>
+            <span class="stat-label">Scores Recorded</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Quick Actions</h2>
+    </div>
+    <div class="card-body quick-actions">
+        <a href="{% url 'create_assessment' %}" class="action-card" id="quick-new-assessment">
+            <span class="action-icon">📝</span>
+            <span class="action-label">New Assessment</span>
+        </a>
+        <a href="{% url 'record_score' %}" class="action-card" id="quick-record-score">
+            <span class="action-icon">🎯</span>
+            <span class="action-label">Record Score</span>
+        </a>
+        <a href="{% url 'assessment_list' %}" class="action-card" id="quick-view-assessments">
+            <span class="action-icon">📋</span>
+            <span class="action-label">View Assessments</span>
+        </a>
+        <a href="{% url 'score_list' %}" class="action-card" id="quick-view-scores">
+            <span class="action-icon">📈</span>
+            <span class="action-label">View Scores</span>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Assessments -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Recent Assessments</h2>
+        <a href="{% url 'assessment_list' %}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="officer-assessments-table">
+            <thead>
+                <tr>
+                    <th>Soldier</th>
+                    <th>Type</th>
+                    <th>Result</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in recent_assessments %}
+                <tr>
+                    <td>{{ a.soldier.get_full_name|default:a.soldier.username }}</td>
+                    <td>{{ a.get_assessment_type_display }}</td>
+                    <td><span class="badge badge--{{ a.result }}">{{ a.get_result_display }}</span></td>
+                    <td>{{ a.date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="table-empty">No assessments yet. <a href="{% url 'create_assessment' %}">Create one →</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent Scores -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Recent Scores</h2>
+        <a href="{% url 'score_list' %}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="officer-scores-table">
+            <thead>
+                <tr>
+                    <th>Soldier</th>
+                    <th>Physical</th>
+                    <th>Mental</th>
+                    <th>Equipment</th>
+                    <th>Overall</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in recent_scores %}
+                <tr>
+                    <td>{{ s.soldier.get_full_name|default:s.soldier.username }}</td>
+                    <td>{{ s.physical_score }}</td>
+                    <td>{{ s.mental_score }}</td>
+                    <td>{{ s.equipment_score }}</td>
+                    <td><strong>{{ s.overall_score }}</strong></td>
+                    <td>{{ s.date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty">No scores recorded. <a href="{% url 'record_score' %}">Record one →</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — CombatPrep{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+
+{% block content %}
+<!-- Profile Summary -->
+{% if profile %}
+<div class="card card--highlight">
+    <div class="card-body profile-summary">
+        <div class="profile-avatar-lg">{{ user.first_name|first|default:"S" }}</div>
+        <div class="profile-details">
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <div class="profile-meta">
+                <span class="meta-item"><strong>Rank:</strong> {{ profile.get_rank_display }}</span>
+                <span class="meta-item"><strong>Service #:</strong> {{ profile.service_number }}</span>
+                <span class="meta-item"><strong>Branch:</strong> {{ profile.get_branch_display }}</span>
+                <span class="meta-item"><strong>Unit:</strong> {{ profile.unit|default:"—" }}</span>
+            </div>
+        </div>
+        <a href="{% url 'edit_profile' %}" class="btn btn-outline" id="edit-profile-btn">Edit Profile</a>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body" style="text-align:center; padding:2rem;">
+        <p>Your profile hasn't been set up yet.</p>
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Set Up Profile</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card stat-card--primary">
+        <div class="stat-icon">📝</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ total_assessments }}</span>
+            <span class="stat-label">Total Assessments</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--success">
+        <div class="stat-icon">✅</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ pass_count }}</span>
+            <span class="stat-label">Passed</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--danger">
+        <div class="stat-icon">❌</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ fail_count }}</span>
+            <span class="stat-label">Failed</span>
+        </div>
+    </div>
+    {% if latest_score %}
+    <div class="stat-card stat-card--info">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ latest_score.overall_score }}</span>
+            <span class="stat-label">{{ latest_score.readiness_level }}</span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Latest Readiness Breakdown -->
+{% if latest_score %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Latest Readiness Breakdown</h2>
+        <a href="{% url 'score_history' %}" class="btn btn-sm btn-outline">Full History</a>
+    </div>
+    <div class="card-body">
+        <div class="score-bars">
+            <div class="score-bar-group">
+                <div class="score-bar-label">
+                    <span>Physical (40%)</span>
+                    <span>{{ latest_score.physical_score }}</span>
+                </div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill score-bar--physical" style="width: {{ latest_score.physical_score }}%"></div>
+                </div>
+            </div>
+            <div class="score-bar-group">
+                <div class="score-bar-label">
+                    <span>Mental (35%)</span>
+                    <span>{{ latest_score.mental_score }}</span>
+                </div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill score-bar--mental" style="width: {{ latest_score.mental_score }}%"></div>
+                </div>
+            </div>
+            <div class="score-bar-group">
+                <div class="score-bar-label">
+                    <span>Equipment (25%)</span>
+                    <span>{{ latest_score.equipment_score }}</span>
+                </div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill score-bar--equipment" style="width: {{ latest_score.equipment_score }}%"></div>
+                </div>
+            </div>
+            <div class="score-bar-group overall">
+                <div class="score-bar-label">
+                    <span><strong>Overall</strong></span>
+                    <span><strong>{{ latest_score.overall_score }}</strong></span>
+                </div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill score-bar--overall" style="width: {{ latest_score.overall_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Assessment History -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Assessment History</h2>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="soldier-assessments-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Result</th>
+                    <th>Officer</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assessments %}
+                <tr>
+                    <td>{{ a.get_assessment_type_display }}</td>
+                    <td><span class="badge badge--{{ a.result }}">{{ a.get_result_display }}</span></td>
+                    <td>{{ a.assessed_by.get_full_name|default:"—" }}</td>
+                    <td>{{ a.date|date:"d M Y" }}</td>
+                    <td>{{ a.notes|truncatewords:10|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="table-empty">No assessments on record.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

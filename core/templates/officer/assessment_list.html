@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessments — CombatPrep{% endblock %}
+{% block page_title %}All Assessments{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Assessments Conducted</h2>
+        <a href="{% url 'create_assessment' %}" class="btn btn-sm btn-primary">+ New Assessment</a>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="all-assessments-table">
+            <thead>
+                <tr>
+                    <th>Soldier</th>
+                    <th>Type</th>
+                    <th>Result</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assessments %}
+                <tr>
+                    <td>{{ a.soldier.get_full_name|default:a.soldier.username }}</td>
+                    <td>{{ a.get_assessment_type_display }}</td>
+                    <td><span class="badge badge--{{ a.result }}">{{ a.get_result_display }}</span></td>
+                    <td>{{ a.date|date:"d M Y" }}</td>
+                    <td>{{ a.notes|truncatewords:15|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="table-empty">No assessments found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

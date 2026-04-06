@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard — CombatPrep{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card stat-card--primary">
+        <div class="stat-icon">👥</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ total_users }}</span>
+            <span class="stat-label">Total Users</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--success">
+        <div class="stat-icon">🎖</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ total_soldiers }}</span>
+            <span class="stat-label">Soldiers</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--warning">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ total_officers }}</span>
+            <span class="stat-label">Officers</span>
+        </div>
+    </div>
+    <div class="stat-card stat-card--info">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-body">
+            <span class="stat-value">{{ avg_readiness|floatformat:1 }}</span>
+            <span class="stat-label">Avg Readiness</span>
+        </div>
+    </div>
+</div>
+
+<!-- User Management Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">User Management</h2>
+        <span class="badge badge--success">{{ active_users }} active</span>
+        <span class="badge badge--danger">{{ inactive_users }} inactive</span>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="users-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ u.first_name|first|default:"U" }}</div>
+                            <span>{{ u.get_full_name|default:u.username }}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge badge--{{ u.role }}">{{ u.get_role_display }}</span></td>
+                    <td>{{ u.email|default:"—" }}</td>
+                    <td>{{ u.date_joined|date:"d M Y" }}</td>
+                    <td>
+                        {% if u.is_active %}
+                        <span class="status-dot status-dot--active"></span> Active
+                        {% else %}
+                        <span class="status-dot status-dot--inactive"></span> Inactive
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u != request.user %}
+                        <a href="{% url 'toggle_user_status' u.pk %}" class="btn btn-sm {% if u.is_active %}btn-danger{% else %}btn-success{% endif %}" id="toggle-user-{{ u.pk }}">
+                            {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="table-empty">No users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent Assessments -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Recent Assessments</h2>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="recent-assessments-table">
+            <thead>
+                <tr>
+                    <th>Soldier</th>
+                    <th>Type</th>
+                    <th>Result</th>
+                    <th>Officer</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in recent_assessments %}
+                <tr>
+                    <td>{{ a.soldier.get_full_name|default:a.soldier.username }}</td>
+                    <td>{{ a.get_assessment_type_display }}</td>
+                    <td><span class="badge badge--{{ a.result }}">{{ a.get_result_display }}</span></td>
+                    <td>{{ a.assessed_by.get_full_name|default:"—" }}</td>
+                    <td>{{ a.date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="table-empty">No assessments yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

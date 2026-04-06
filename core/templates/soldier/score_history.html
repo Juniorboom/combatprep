@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Score History — CombatPrep{% endblock %}
+{% block page_title %}My Score History{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Readiness Score History</h2>
+    </div>
+    <div class="table-wrapper">
+        <table class="data-table" id="score-history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Physical</th>
+                    <th>Mental</th>
+                    <th>Equipment</th>
+                    <th>Overall</th>
+                    <th>Level</th>
+                    <th>Officer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in scores %}
+                <tr>
+                    <td>{{ s.date|date:"d M Y" }}</td>
+                    <td>{{ s.physical_score }}</td>
+                    <td>{{ s.mental_score }}</td>
+                    <td>{{ s.equipment_score }}</td>
+                    <td><strong>{{ s.overall_score }}</strong></td>
+                    <td><span class="badge badge--readiness-{{ s.readiness_level|slugify }}">{{ s.readiness_level }}</span></td>
+                    <td>{{ s.scored_by.get_full_name|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="table-empty">No scores recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
